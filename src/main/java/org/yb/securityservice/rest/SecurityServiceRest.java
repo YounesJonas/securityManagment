@@ -1,6 +1,9 @@
 package org.yb.securityservice.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +31,21 @@ public class SecurityServiceRest {
 		}
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/getConnectedUser")
+	public @ResponseBody ConnectedUser getConnectedUser() {
+		ConnectedUser connectedUser = new ConnectedUser();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String username =  (String) auth.getPrincipal();
+		
+		if(username.isEmpty()) {
+			connectedUser.setUsername("");
+		}else {
+			connectedUser.setUsername(username);
+		}
+		
+		return connectedUser;
+	}
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/status")
 	public @ResponseBody Iterable<Status> getStatus() {
 		return accountService.getAllStatus();
